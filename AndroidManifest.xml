@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Useless file, needed by AndroidAnnotations, to make it believe this is an Android project -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.bug.apt"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk android:minSdkVersion="10" />
+
+    <application>
+    </application>
+
+</manifest>
