@@ -1,37 +1,33 @@
 package com.bug.apt;
 
+/*
+ * The import triggers a compilation error, if @SuppressWarnings has a reference to
+ * Integer.MAX_VALUE: "The import com.bug.apt.other.SomeBean_ cannot be resolved"
+ */
 import com.bug.apt.other.SomeBean_;
 
-/*
- * The problem only occurs when you do a Project > Clean.
- * 
- * It occurs at the following line: Class<?> test = SomeBean_.class;
- */
+@SuppressWarnings("unused")
 public class SomeClass {
 
 	/*
-	 * If you comment the following line, no error will occur.
+	 * The problem only occurs when you do a Project > Clean. It doesn't occur
+	 * when saving the file without cleaning (which removes
+	 * com.bug.apt.other.SomeBean_)
 	 * 
-	 * If you replace Constants.VALUE with its value (42), no error will occur.
+	 * If you comment "@SuppressWarnings("" + Integer.MAX_VALUE)", no error will
+	 * occur.
+	 * 
+	 * If you replace Integer.MAX_VALUE with its value, no error will occur.
+	 * 
+	 * This seems to be because @SuppressWarnings fires the Eclipse annotation
+	 * processing, which sees a reference that needs to be resolved
+	 * (Integer.MAX_VALUE), and therefore tries to resolve imports, where it
+	 * finds import com.bug.apt.other.SomeBean_ and cannot resolve it.
+	 * 
+	 * This can happen with any annotation processor that generates code.
 	 */
-	@SomeAnnotation(Constants.VALUE)
-	String test;
+	@SuppressWarnings("" + Integer.MAX_VALUE)
+	// @SuppressWarnings("" + 2147483647)
+	Object none;
 
-	private void someMethod() {
-		/*
-		 * Triggers a compilation error, if @SomeAnnotation has a reference to
-		 * Constants.VALUE. When doing Project > Clean, it seems that both
-		 * Constants.VALUE and com.bug.apt.other.SomeBean_ have compilation
-		 * errors for half a second, then the error on Constants.VALUE
-		 * disappears and you're left with an error on the following line.
-		 */
-		Class<?> test = SomeBean_.class;
-
-		/*
-		 * This never triggers a compilation error. Using Fully Qualified names
-		 * solves the problems, which seems to show that the problems lies in
-		 * import declarations.
-		 */
-		Class<?> test2 = com.bug.apt.other.SomeBean_.class;
-	}
 }
