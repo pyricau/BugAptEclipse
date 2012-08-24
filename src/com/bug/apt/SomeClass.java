@@ -1,33 +1,36 @@
 package com.bug.apt;
 
 /*
- * The import triggers a compilation error, if @SuppressWarnings has a reference to
- * Integer.MAX_VALUE: "The import com.bug.apt.other.SomeBean_ cannot be resolved"
+ * The import triggers a compilation error, if SomeAnnotation has a reference to
+ * Integer.MAX_VALUE: "The import generated.GeneratedEntity cannot be resolved"
  */
-import com.bug.apt.other.SomeBean_;
+import generated.GeneratedEntity;
 
 @SuppressWarnings("unused")
 public class SomeClass {
 
-	/*
+	/**
 	 * The problem only occurs when you do a Project > Clean. It doesn't occur
-	 * when saving the file without cleaning (which removes
-	 * com.bug.apt.other.SomeBean_)
+	 * when saving the file without cleaning (incremental compilation), because
+	 * cleaning removes generated.GeneratedEntity, which is then generated
+	 * again.
 	 * 
-	 * If you comment "@SuppressWarnings("" + Integer.MAX_VALUE)", no error will
-	 * occur.
+	 * If you comment "@SomeAnnotation(Integer.MAX_VALUE)", the error
+	 * disappears.
 	 * 
-	 * If you replace Integer.MAX_VALUE with its value, no error will occur.
+	 * If you replace Integer.MAX_VALUE with its value, the error disappears.
 	 * 
-	 * This seems to be because @SuppressWarnings fires the Eclipse annotation
-	 * processing, which sees a reference that needs to be resolved
+	 * This seems to be because {@link SomeAnnotation} fires the Eclipse
+	 * annotation processing, which sees a reference that needs to be resolved
 	 * (Integer.MAX_VALUE), and therefore tries to resolve imports, where it
-	 * finds import com.bug.apt.other.SomeBean_ and cannot resolve it.
+	 * finds import {@link generated.GeneratedEntity} and cannot resolve it.
 	 * 
-	 * This can happen with any annotation processor that generates code.
+	 * This can happen with any annotation java 6 processor that generates code.
+	 * Also note that I couldn't reproduce this on the simple java 5 processor
+	 * given here: http://www.eclipse.org/jdt/apt/introToAPT.html
 	 */
-	@SuppressWarnings("" + Integer.MAX_VALUE)
-	// @SuppressWarnings("" + 2147483647)
+	@SomeAnnotation(Integer.MAX_VALUE)
+	// @SomeAnnotation(2147483647)
 	Object none;
 
 }
